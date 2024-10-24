@@ -8,7 +8,7 @@ const AdminDashboard = () => {
     useEffect(() => {
         const fetchImages = async () => {
             try {
-                const response = await axios.get('http://localhost:8000/api/user-images/1'); // Replace 1 with the actual user ID
+                const response = await axios.get('http://localhost:8000/api/user-images/1'); // UserID HardCoded For Demo
                 const { data } = response.data;
 
                 setImages(data);
@@ -21,12 +21,12 @@ const AdminDashboard = () => {
     }, []);
 
     return (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {images.length > 0 ? (
                 images.map((image) => (
-                    <div key={image.id}>
+                    <div key={image.id} className="w-full h-48 md:h-56 lg:h-64">
                         <img
-                            className="h-auto max-w-full rounded-lg"
+                            className="h-full w-full object-cover rounded-lg"
                             src={image.url}
                             alt={image.filename}
                         />
