@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 import useSWR from 'swr'
 import axios from '@/lib/axios'
 import { useEffect } from 'react'
@@ -105,7 +106,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
 
         if (middleware === 'auth' && !user?.email_verified_at)
             router.push('/verify-email')
-        
+
         if (
             window.location.pathname === '/verify-email' &&
             user?.email_verified_at

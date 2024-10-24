@@ -1,23 +1,29 @@
-import Header from '@/app/(app)/Header'
-
-export const metadata = {
-    title: 'Laravel - Dashboard',
-}
+'use client'
+import { useAuth } from '@/hooks/auth'
+import AdminDashboard from '@/components/AdminDashboard'
+import UserDashboard from '@/components/UserDashboard'
 
 const Dashboard = () => {
+    const { user } = useAuth() // Get the user data from your authentication hook
+    console.log(user)
+
     return (
-        <>
-            <Header title="Dashboard" />
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 bg-white border-b border-gray-200">
-                            You are logged in!
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </>
+        <div className="p-6">
+            {/* Display the user's name */}
+            {user ? (
+                <>
+                    {/* Conditional rendering based on user role */}
+                    {user.role === 'admin' ? (
+                        <AdminDashboard />
+                    ) : (
+                        <UserDashboard />
+                    )}
+                </>
+            ) : (
+                <p className="mt-4 text-lg">Welcome to the Dashboard!</p>
+            )}
+            {/* Additional dashboard content goes here */}
+        </div>
     )
 }
 
