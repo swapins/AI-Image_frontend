@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Pusher from 'pusher-js'
+import { useAuth } from '@/hooks/auth'
 
 const UserDashboard = () => {
     const [imagePreview, setImagePreview] = useState(null)
@@ -11,8 +12,10 @@ const UserDashboard = () => {
     const [generationMessage, setGenerationMessage] = useState('')
     const [generatedImages, setGeneratedImages] = useState([]) // State for generated images
 
+    const { user } = useAuth({ middleware: 'auth' })
+
     useEffect(() => {
-        // Set default Axios configuration
+        // Set default Axios configuration and fetch CSRF token for secure requests
         axios.defaults.withCredentials = true
         axios.defaults.baseURL = 'http://localhost:8000'
 
@@ -27,6 +30,7 @@ const UserDashboard = () => {
         fetchCsrfToken()
     }, [])
 
+    // Handle image selection and set preview
     const handleImageChange = event => {
         const file = event.target.files[0]
         if (file) {
@@ -42,6 +46,7 @@ const UserDashboard = () => {
         }
     }
 
+    // Handle image upload to the server
     const handleImageUpload = async event => {
         event.preventDefault()
         if (!selectedImage) {
@@ -53,6 +58,7 @@ const UserDashboard = () => {
         formData.append('image', selectedImage)
 
         try {
+            // Upload image and handle the response
             const response = await axios.post('/api/upload-image', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -60,9 +66,8 @@ const UserDashboard = () => {
                 },
             })
             setUploadStatus('Upload successful!')
-            console.log(response.data)
 
-            // Start image generation after successful upload
+            // Start generating image variations after successful upload
             const imageId = response.data.image.id
             await handleGenerate(imageId)
         } catch (error) {
@@ -71,52 +76,41 @@ const UserDashboard = () => {
         }
     }
 
+    // Start generating image variations and track progress
     const handleGenerate = async imageId => {
         setIsGenerating(true)
         setProgress(0)
         setGenerationMessage('')
 
-        // Initialize Pusher
+        // Initialize Pusher for real-time updates
         const pusher = new Pusher('15483f78c495d25ba602', {
             cluster: 'ap2',
             encrypted: true,
         })
 
-        const userId = 2 // Assuming user ID is 2, replace with the actual user ID
+        const userId = user.id // Get user ID for subscription
 
-        // Subscribe to the private channel for this user
+        // Subscribe to a private channel for the current user
         const channel = pusher.subscribe(`images.${userId}`)
-        console.log('Channel Subscribed:', channel)
 
         try {
+            // Request image generation from the server
             const response = await axios.get(
                 `/api/generate-variations/${imageId}`,
             )
-            console.log('Image generation started:', response.data)
 
             if (response.data.success) {
                 setGenerationMessage(response.data.message)
 
-                // Listen for the 'image.generated' event
+                // Listen for the 'image.generated' event and update progress
                 channel.bind('image.generated', data => {
-                    console.log('Image generation data received:', data)
-
-                    // Update progress
                     setProgress(data.imageData.progress)
 
-                    // Add newly generated image URL to the gallery
+                    // Add newly generated image to the gallery
                     setGeneratedImages(prevImages => [
                         ...prevImages,
                         data.imageData.url,
                     ])
-                })
-
-                channel.bind('pusher:subscription_succeeded', () => {
-                    console.log(`Successfully subscribed to images.${userId}`)
-                })
-
-                channel.bind('pusher:subscription_error', status => {
-                    console.error(`Subscription error: ${status}`)
                 })
             }
         } catch (error) {
@@ -186,7 +180,7 @@ const UserDashboard = () => {
                         key={index}
                         className="rounded-lg overflow-hidden shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
                         <img
-                            className="h-full w-full object-cover" // Set a fixed height and full width
+                            className="h-62 w-full object-cover" // Fixed height and full width with object-fit cover
                             src={imageUrl} // Use the image URL from the generated images
                             alt={`Generated image ${index + 1}`}
                         />
