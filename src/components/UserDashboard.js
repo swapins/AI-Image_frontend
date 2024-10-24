@@ -126,11 +126,11 @@ const UserDashboard = () => {
         <div className="flex flex-col md:flex-row p-6 md:p-10 bg-gray-100">
             {/* Left Column for Image Upload and Preview */}
             <div className="md:w-1/3 p-4 md:p-6 bg-white shadow-md rounded-lg h-full flex flex-col items-center">
-                <h2 className="text-xl font-semibold mb-4 text-center">
+                <h2 className="text-xl font-semibold mb-2 text-center">
                     Upload Image
                 </h2>
                 {generationMessage && (
-                    <p className="my-2 text-yellow-700">{generationMessage}</p>
+                    <p className="my-2 text-yellow-700 text-sm text-center">{generationMessage}</p>
                 )}
                 <form onSubmit={handleImageUpload} className="w-full">
                     <input
@@ -155,15 +155,15 @@ const UserDashboard = () => {
                     </div>
                 )}
                 {uploadStatus && (
-                    <p className="mt-4 text-red-500">{uploadStatus}</p>
+                    <p className="mt-2 text-sm text-red-500">{uploadStatus}</p>
                 )}
                 {isGenerating && (
-                    <p className="mt-4 text-green-500">
+                    <p className="mt-2 text-green-500">
                         Generating image variations... {progress}%
                     </p>
                 )}
 
-                <div className="mt-4 w-full">
+                <div className="mt-2 w-full">
                     <div className="relative w-full h-4 bg-gray-200 rounded">
                         <div
                             className="absolute top-0 left-0 h-full bg-blue-500 rounded"
@@ -174,13 +174,11 @@ const UserDashboard = () => {
             </div>
 
             {/* Right Column for Gallery */}
-            <div className="md:w-2/3 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-2 overflow-y-scroll md:px-4">
+            <div className="md:w-2/3 grid grid-cols-2 md:grid-cols-4 gap-4 px-4">
                 {generatedImages.map((imageUrl, index) => (
-                    <div
-                        key={index}
-                        className="rounded-lg overflow-hidden shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                    <div key={index} className="w-full h-48 md:h-56 lg:h-64">
                         <img
-                            className="h-62 w-full object-cover" // Fixed height and full width with object-fit cover
+                            className="h-full w-full object-cover rounded-lg" // Fixed height and full width with object-fit cover
                             src={imageUrl} // Use the image URL from the generated images
                             alt={`Generated image ${index + 1}`}
                         />
