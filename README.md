@@ -1,91 +1,162 @@
-# Laravel Breeze - Next.js Edition ▲
 
-## Introduction
+# Image Variation SaaS Application frontend - Next.js
 
-This repository is an implementation of the [Laravel Breeze](https://laravel.com/docs/starter-kits) application / authentication starter kit frontend in [Next.js](https://nextjs.org). All of the authentication boilerplate is already written for you - powered by [Laravel Sanctum](https://laravel.com/docs/sanctum), allowing you to quickly begin pairing your beautiful Next.js frontend with a powerful Laravel backend.
+This repository contains the frontend for a SaaS application that allows users to upload images and generate variations using a generative AI API. The frontend is built with **Next.js** and connects to a **Laravel** backend.
 
-## Official Documentation
+## Table of Contents
 
-### Installation
+- Features
+- Technologies Used
+- Getting Started
+- Frontend Setup
+- Backend Setup
+- Running the Application
+- API Integration
+- Testing
+- Contributing
+- License
 
-First, create a Next.js compatible Laravel backend by installing Laravel Breeze into a [fresh Laravel application](https://laravel.com/docs/installation) and installing Breeze's API scaffolding:
+## Features
 
-```bash
-# Create the Laravel application...
-laravel new next-backend
+- **User Authentication**: Registration and login functionality using Laravel's built-in authentication.
+- **Image Upload**: Users can upload images (PNG or JPG), stored in AWS S3, with metadata maintained in MySQL.
+- **Generative AI Integration**: Utilize a mock generative AI API (or an actual one, e.g., OpenAI DALL·E) to create variations of uploaded images.
+- **User Dashboard**: A clean, responsive dashboard for users to manage their uploaded images and view/download generated variations.
+- **Performance Optimization**: Efficient handling of large file uploads and API requests through Laravel Queues.
+- **Real-time Updates**: Users can see progress updates for image generation using WebSockets.
 
-cd next-backend
+## Technologies Used
 
-# Install Breeze and dependencies...
-composer require laravel/breeze --dev
+- **Frontend**: Next.js, React, Tailwind CSS, Axios
+- **Backend**: Laravel, PHP, MySQL
+- **Cloud Storage**: AWS S3 (or another cloud provider)
 
-php artisan breeze:install api
+## Getting Started
 
-# Run database migrations...
-php artisan migrate
-```
+### Prerequisites
 
-Next, ensure that your application's `APP_URL` and `FRONTEND_URL` environment variables are set to `http://localhost:8000` and `http://localhost:3000`, respectively.
+Ensure you have the following installed:
 
-After defining the appropriate environment variables, you may serve the Laravel application using the `serve` Artisan command:
+- Node.js (v14 or later)
+- Yarn or npm
+- Docker (optional, for easier setup)
+- Composer for Laravel
+- Access to an AWS account for S3 (or another cloud provider)
 
-```bash
-# Serve the application...
-php artisan serve
-```
+### Clone the Repository
 
-Next, clone this repository and install its dependencies with `yarn install` or `npm install`. Then, copy the `.env.example` file to `.env.local` and supply the URL of your backend:
+1. Clone this repository to your local machine:
+   ```
+   git clone https://github.com/swapins/AI-Image_frontend.git
+   cd AI-Image_frontend
+   ```
 
-```
-NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
-```
+### Frontend Setup
 
-Finally, run the application via `npm run dev`. The application will be available at `http://localhost:3000`:
+1. Navigate to the frontend directory:
+   ```
+   cd AI-Image_frontend
+   ```
 
-```
-npm run dev
-```
+2. Install dependencies:
+   ```
+   npm install
+   ```
+   or
+   ```
+   yarn install
+   ```
 
-> Note: Currently, we recommend using `localhost` during local development of your backend and frontend to avoid CORS "Same-Origin" issues.
+3. Create a `.env.local` file in the `frontend` directory and add your API URL and user keys:
+   ```
+   NEXT_PUBLIC_API_URL=http://localhost:8000/api
+   PUSHER_API_KEY=your_api_key_here
+   ```
 
-### Authentication Hook
+### Backend Setup
 
-This Next.js application contains a custom `useAuth` React hook, designed to abstract all authentication logic away from your pages. In addition, the hook can be used to access the currently authenticated user:
+1. Navigate to the backend directory:
+   ```
+   cd ../backend
+   ```
 
-```js
-const ExamplePage = () => {
-    const { logout, user } = useAuth({ middleware: 'auth' })
+2. Install dependencies via Composer:
+   ```
+   composer install
+   ```
 
-    return (
-        <>
-            <p>{user?.name}</p>
+3. Create a `.env` file based on the `.env.example` provided and configure your database and cloud storage settings. Include your generative AI API key in the backend `.env`:
+   ```
+   GENERATIVE_AI_API_KEY=your_api_key_here
+   ```
 
-            <button onClick={logout}>Sign out</button>
-        </>
-    )
-}
+4. Run migrations to set up the database:
+   ```
+   php artisan migrate
+   ```
 
-export default ExamplePage
-```
+5. Start the Laravel development server:
+   ```
+   php artisan serve
+   ```
 
-> Note: You will need to use [optional chaining](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining) (`user?.name` instead of `user.name`) when accessing properties on the user object to account for Next.js's initial server-side render.
+### Running the Application
 
-### Named Routes
+1. Start the frontend development server:
+   ```
+   cd ../frontend
+   npm run dev
+   ```
+   or
+   ```
+   yarn dev
+   ```
 
-For convenience, [Ziggy](https://github.com/tighten/ziggy#spas-or-separate-repos) may be used to reference your Laravel application's named route URLs from your React application.
+2. Open your browser and navigate to `http://localhost:3000` to view the application.
 
-## Contributing
 
-Thank you for considering contributing to Breeze Next! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-## Code of Conduct
+## Testing
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Unit and Integration Tests
 
-## Security Vulnerabilities
+To run the tests:
 
-Please review [our security policy](https://github.com/laravel/breeze-next/security/policy) on how to report security vulnerabilities.
+1. **For Laravel**:
+   ```
+   cd backend
+   php artisan test
+   ```
 
-## License
+2. **For Next.js**:
+   ```
+   cd frontend
+   npm run test
+   ```
+   or
+   ```
+   yarn test
+   ```
 
-Laravel Breeze Next is open-sourced software licensed under the [MIT license](LICENSE.md).
+## Performance Considerations
+- Use queues to offload time-consuming tasks like image generation.
+- Optimize database queries with appropriate indexes and relationships.
+- Store images on cloud services like AWS S3 to reduce local storage overhead and improve scalability.
+
+## Bonus Features
+- **Real-Time Updates**: Implemented via Pusher, users can see live updates of their image generation progress.
+- **Role-Based Access Control (RBAC)**: Admin users can view all uploaded images, while regular users can only view their own.
+
+
+## Developer Information
+
+This project was developed by Swapin Vidya.
+
+### Contact Information:
+- **Email**: swapin@laravelone.in
+- **GitHub**: [https://github.com/swapins](https://github.com/swapins)
+- **LinkedIn**: [www.linkedin.com/in/swapin-vidya](www.linkedin.com/in/swapin-vidya)
+- **Portfolio**: [https://sevati.in/swapin](https://sevati.in/swapin)
+
+### Acknowledgments
+Special thanks to all open-source libraries and tools used in this project:
